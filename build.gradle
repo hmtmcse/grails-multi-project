@@ -147,7 +147,8 @@ subprojects { project ->
 // Grails Plugin Dependency
 String grailsPluginPath = "$grailsPluginDependencyPath"
 def dependentGrailsPlugin = [
-        "grails-swagger": "https://github.com/hmtmcse/grails-swagger.git"
+        "grails-swagger": "https://github.com/hmtmcse/grails-swagger.git",
+        "grails-saas": "https://github.com/hmtmcse/grails-saas.git"
 ]
 task resolveDependentGrailsPlugin {
     doLast {
