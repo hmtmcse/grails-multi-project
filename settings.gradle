@@ -1,0 +1,16 @@
+rootProject.name = 'Application'
+include 'application'
+
+
+
+
+
+// Grails Plugin Dependency
+String grailsPluginPath = "$grailsPluginDependencyPath"
+File grailsPlugin = file(grailsPluginPath)
+if (grailsPlugin.exists()){
+    grailsPlugin.list().each {
+        include(it)
+        project(":${it}").projectDir = file( grailsPluginPath + it)
+    }
+}
