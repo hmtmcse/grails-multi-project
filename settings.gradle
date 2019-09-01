@@ -3,8 +3,6 @@ include 'application'
 
 
 
-
-
 // Grails Plugin Dependency
 String grailsPluginPath = "$grailsPluginDependencyPath"
 File grailsPlugin = file(grailsPluginPath)
@@ -14,5 +12,17 @@ if (grailsPlugin.exists()){
             include(it)
             project(":${it}").projectDir = file( grailsPluginPath + it)
         }
+    }
+}
+
+
+
+String applicationModule = "$grailsApplicationModulesPath"
+String applicationModuleGradlePath = "$applicationModuleGradlePath"
+if(new File(applicationModuleGradlePath).exists()) {
+    apply from: applicationModuleGradlePath
+    myPlugins().each {
+        include(it)
+        project(":${it}").projectDir = file( applicationModule + it)
     }
 }

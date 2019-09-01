@@ -1,7 +1,9 @@
 buildscript {
     repositories {
+        mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         maven { url "https://dl.bintray.com/hmtmcse/maven/" }
+        maven { url "http://central.maven.org/maven2/" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
@@ -48,6 +50,7 @@ subprojects { project ->
             mavenLocal()
             maven { url "https://repo.grails.org/grails/core" }
             maven { url "https://dl.bintray.com/hmtmcse/maven/" }
+            maven { url "http://central.maven.org/maven2/" }
         }
 
         configurations {
@@ -91,8 +94,9 @@ subprojects { project ->
 
             // Testing
             testCompile "org.grails:grails-gorm-testing-support"
-            testCompile "org.mockito:mockito-core"
             testCompile "org.grails:grails-web-testing-support"
+            testCompile "org.mockito:mockito-core"
+
 
         }
 
@@ -114,7 +118,6 @@ subprojects { project ->
         if ( isGrailsPlugin ) {
             dependencies {
                 profile "org.grails.profiles:web-plugin"
-                testCompile "org.grails:grails-plugin-testing"
             }
         }
 
