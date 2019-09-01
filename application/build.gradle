@@ -5,7 +5,6 @@ group "com.hmtmcse.application"
 
 grails {
     plugins {
-        compile project(':grails-saas')
-        compile project(':grails-swagger')
+        compile project(':my-plugin')
     }
 }

@@ -14,29 +14,34 @@ buildscript {
 
 ext {
     grailsApps = ['application']
-    grailsPlugins = ['application-modules', 'grails-plugin']
 }
 
+Boolean isItPlugin(String pluginName){
+    return file("$grailsPluginDependencyPath").list().contains(pluginName) || file("$grailsApplicationModulesPath").list().contains(pluginName)
+}
 
 subprojects { project ->
+
     boolean isGrailsApp = grailsApps.contains(project.name)
-    boolean isGrailsPlugin = grailsPlugins.contains(project.name)
+    boolean isGrailsPlugin = isItPlugin(project.name)
     boolean isGrailsProject = isGrailsApp || isGrailsPlugin
 
     if ( isGrailsProject ) {
         apply plugin:"eclipse"
         apply plugin:"idea"
-
+        apply plugin:"com.bertramlabs.asset-pipeline"
+        
+        
         if ( isGrailsApp ) {
-            apply plugin:"war"
             apply plugin:"org.grails.grails-web"
+            apply plugin:"war"
             apply plugin:"org.grails.grails-gsp"
-            apply plugin:"com.bertramlabs.asset-pipeline"
         }
 
         if ( isGrailsPlugin ) {
             apply plugin:"org.grails.grails-plugin"
             apply plugin:"org.grails.grails-plugin-publish"
+            apply plugin:"org.grails.grails-gsp"
         }
 
         repositories {
@@ -51,8 +56,8 @@ subprojects { project ->
                 extendsFrom developmentOnly
             }
         }
-        
-        
+
+
         // Common Dependency
         dependencies {
             // Spring Boot Dependency
@@ -62,9 +67,11 @@ subprojects { project ->
             compile "org.springframework.boot:spring-boot-starter-actuator"
             compile "org.springframework.boot:spring-boot-starter-tomcat"
 
+
             // Grails Dependency
             compile "org.grails:grails-core"
             compile "org.grails:grails-web-boot"
+            compile "org.grails.plugins:gsp"
             compile "org.grails:grails-logging"
             compile "org.grails:grails-plugin-rest"
             compile "org.grails:grails-plugin-databinding"
@@ -73,27 +80,36 @@ subprojects { project ->
             compile "org.grails:grails-plugin-url-mappings"
             compile "org.grails:grails-plugin-interceptors"
             compile "org.grails.plugins:cache"
-            compile "org.grails.plugins:async"            
+            compile "org.grails.plugins:async"     
             console "org.grails:grails-console"
-            compile "org.grails.plugins:gsp"            
+
+
+            // Other Dependency
+            compileOnly "io.micronaut:micronaut-inject-groovy"
             runtime "com.bertramlabs.plugins:asset-pipeline-grails:3.0.10"
+
 
             // Testing
             testCompile "org.grails:grails-gorm-testing-support"
+            testCompile "org.mockito:mockito-core"
             testCompile "org.grails:grails-web-testing-support"
+
         }
 
         if ( isGrailsApp ) {
             dependencies {
-                profile "org.grails.profiles:web"
                 compile "org.grails.plugins:events"
+                profile "org.grails.profiles:web"
+
+                // Database
                 compile "org.grails.plugins:hibernate5"
                 compile "org.hibernate:hibernate-core:5.4.0.Final"
+                runtime "com.h2database:h2"
                 runtime "org.apache.tomcat:tomcat-jdbc"
                 runtime "javax.xml.bind:jaxb-api:2.3.0"
-                runtime "com.h2database:h2"
             }
         }
+
 
         if ( isGrailsPlugin ) {
             dependencies {
@@ -112,31 +128,16 @@ subprojects { project ->
             String springProfilesActive = 'spring.profiles.active'
             systemProperty springProfilesActive, System.getProperty(springProfilesActive)
         }
-
-        if ( isGrailsPlugin ) {
-            bootJar.enabled = false
-            grailsPublish {
-                user = 'user'
-                key = 'key'
-                githubSlug = 'foo/bar'
-                license {
-                    name = 'Apache-2.0'
-                }
-                title = "My Plugin"
-                desc = "Full plugin description"
-                developers = [johndoe:"John Doe"]
-            }
-        }
     }
 
     afterEvaluate {
         if ( isGrailsProject ) {
             assets {
                 minifyJs = true
-                minifyCss = true                
+                minifyCss = true
                 if(isGrailsPlugin){
                     packagePlugin = true
-                }                    
+                }
             }
         }
     }

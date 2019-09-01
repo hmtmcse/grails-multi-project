@@ -10,7 +10,9 @@ String grailsPluginPath = "$grailsPluginDependencyPath"
 File grailsPlugin = file(grailsPluginPath)
 if (grailsPlugin.exists()){
     grailsPlugin.list().each {
-        include(it)
-        project(":${it}").projectDir = file( grailsPluginPath + it)
+        if(it != "empty"){
+            include(it)
+            project(":${it}").projectDir = file( grailsPluginPath + it)
+        }
     }
 }
