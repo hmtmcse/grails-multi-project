@@ -1,8 +1,8 @@
-package plugin
+package yourplugin
 
 import grails.plugins.*
 
-class PluginGrailsPlugin extends Plugin {
+class MyPluginGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "4.0.0 > *"

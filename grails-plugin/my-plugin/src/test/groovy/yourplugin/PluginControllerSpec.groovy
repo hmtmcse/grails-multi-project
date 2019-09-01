@@ -1,4 +1,4 @@
-package plugin
+package yourplugin
 
 import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
