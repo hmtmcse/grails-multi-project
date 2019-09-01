@@ -11,5 +11,3 @@ out/
 .settings
 .classpath
 
-/grails-plugin
-/application-modules
