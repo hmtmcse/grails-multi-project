@@ -16,7 +16,7 @@ if (grailsPlugin.exists()){
 }
 
 
-
+// Application Module
 String applicationModule = "$grailsApplicationModulesPath"
 String applicationModuleGradlePath = "$applicationModuleGradlePath"
 if(new File(applicationModuleGradlePath).exists()) {
@@ -24,5 +24,17 @@ if(new File(applicationModuleGradlePath).exists()) {
     myPlugins().each {
         include(it)
         project(":${it}").projectDir = file( applicationModule + it)
+    }
+}
+
+
+// Other Plugin
+File otherPlugins = file("$otherPluginPath")
+if (otherPlugins.exists()){
+    otherPlugins.list().each {
+        if(it != "empty"){
+            include(it)
+            project(":${it}").projectDir = file( "$otherPluginPath" + it)
+        }
     }
 }
