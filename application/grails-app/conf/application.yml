@@ -23,6 +23,8 @@ spring:
             check-template-location: false
     devtools:
         restart:
+            additional-paths:
+                - '../grails-plugin/**'
             additional-exclude:
                 - '*.gsp'
                 - '**/*.gsp'

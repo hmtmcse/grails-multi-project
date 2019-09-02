@@ -4,7 +4,7 @@ class PluginController {
 
 
     def index() {
-        render ("Bismillah from plugi..")
+        render ("Bismillah from Plugin.....")
     }
 
 }

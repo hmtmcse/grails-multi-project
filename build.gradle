@@ -22,6 +22,11 @@ Boolean isItPlugin(String pluginName){
     return file("$grailsPluginDependencyPath").list().contains(pluginName) || file("$grailsApplicationModulesPath").list().contains(pluginName)
 }
 
+allprojects {
+    apply plugin: "idea"
+}
+
+
 subprojects { project ->
 
     boolean isGrailsApp = grailsApps.contains(project.name)
@@ -53,18 +58,12 @@ subprojects { project ->
             maven { url "http://central.maven.org/maven2/" }
         }
 
-        configurations {
-            developmentOnly
-            runtimeClasspath {
-                extendsFrom developmentOnly
-            }
-        }
+
 
 
         // Common Dependency
         dependencies {
             // Spring Boot Dependency
-            developmentOnly("org.springframework.boot:spring-boot-devtools")
             implementation "org.springframework.boot:spring-boot-starter-logging"
             implementation "org.springframework.boot:spring-boot-autoconfigure"
             implementation "org.springframework.boot:spring-boot-starter-actuator"
