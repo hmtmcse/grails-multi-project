@@ -1,0 +1,160 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+        maven { url "https://dl.bintray.com/hmtmcse/maven/" }
+        maven { url "http://central.maven.org/maven2/" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath "org.grails.plugins:hibernate5:$grailsHibernetVersion"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:3.0.10"
+        classpath 'org.ajoberstar.grgit:grgit-core:3.1.1'
+    }
+}
+
+
+ext {
+    grailsApps = ['application']
+}
+
+Boolean isItPlugin(String pluginName){
+    return file("$grailsPluginDependencyPath").list().contains(pluginName) || file("$grailsApplicationModulesPath").list().contains(pluginName)
+}
+
+
+subprojects { project ->
+
+    boolean isGrailsApp = grailsApps.contains(project.name)
+    boolean isGrailsPlugin = isItPlugin(project.name)
+    boolean isGrailsProject = isGrailsApp || isGrailsPlugin
+
+    if ( isGrailsProject ) {
+        apply plugin:"eclipse"
+        apply plugin:"idea"
+        apply plugin:"com.bertramlabs.asset-pipeline"
+        
+        
+        if ( isGrailsApp ) {
+            apply plugin:"org.grails.grails-web"
+            apply plugin:"war"
+            apply plugin:"org.grails.grails-gsp"
+        }
+
+        if ( isGrailsPlugin ) {
+            apply plugin:"org.grails.grails-plugin"
+            apply plugin:"org.grails.grails-plugin-publish"
+            apply plugin:"org.grails.grails-gsp"
+        }
+
+        repositories {
+            mavenLocal()
+            maven { url "https://repo.grails.org/grails/core" }
+            maven { url "https://dl.bintray.com/hmtmcse/maven/" }
+            maven { url "http://central.maven.org/maven2/" }
+        }
+
+
+        // Common Dependency
+        dependencies {
+            // Spring Boot Dependency
+            compile "org.springframework.boot:spring-boot-starter-logging"
+            compile "org.springframework.boot:spring-boot-autoconfigure"
+            compile "org.springframework.boot:spring-boot-starter-actuator"
+            compile "org.springframework.boot:spring-boot-starter-tomcat"
+
+
+            // Grails Dependency
+            compile "org.grails:grails-core"
+            compile "org.grails:grails-web-boot"
+            compile "org.grails.plugins:gsp"
+            compile "org.grails:grails-logging"
+            compile "org.grails:grails-plugin-rest"
+            compile "org.grails:grails-plugin-databinding"
+            compile "org.grails:grails-plugin-i18n"
+            compile "org.grails:grails-plugin-services"
+            compile "org.grails:grails-plugin-url-mappings"
+            compile "org.grails:grails-plugin-interceptors"
+            compile "org.grails.plugins:cache"
+            compile "org.grails.plugins:async"     
+            console "org.grails:grails-console"
+
+
+            // Other Dependency
+            runtime "com.bertramlabs.plugins:asset-pipeline-grails:3.0.10"
+
+
+            // Testing
+            testCompile "org.grails:grails-gorm-testing-support"
+            testCompile "org.grails:grails-web-testing-support"
+
+        }
+
+        if ( isGrailsApp ) {
+            dependencies {
+                compile "org.grails.plugins:events"
+                profile "org.grails.profiles:web"
+
+                // Database
+                compile "org.grails.plugins:hibernate5"
+                compile "org.hibernate:hibernate-core:5.1.5.Final"
+
+                runtime "com.h2database:h2"
+                runtime "org.apache.tomcat:tomcat-jdbc"
+                runtime "javax.xml.bind:jaxb-api:2.3.0"
+            }
+        }
+
+
+        if ( isGrailsPlugin ) {
+            dependencies {
+                profile "org.grails.profiles:web-plugin"
+                provided "org.grails:grails-plugin-services"
+                provided "org.grails:grails-plugin-domain-class"
+            }
+        }
+
+        bootRun {
+            jvmArgs('-Dspring.output.ansi.enabled=always')
+            addResources = true
+            String springProfilesActive = 'spring.profiles.active'
+            systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+        }
+    }
+
+    afterEvaluate {
+        if ( isGrailsProject ) {
+            assets {
+                minifyJs = true
+                minifyCss = true
+                if(isGrailsPlugin){
+                    packagePlugin = true
+                }
+            }
+        }
+    }
+}
+
+
+
+// Grails Plugin Dependency
+String grailsPluginPath = "$grailsPluginDependencyPath"
+def dependentGrailsPlugin = [
+        "grails-swagger": "https://github.com/hmtmcse/grails-swagger.git",
+        "grails-saas": "https://github.com/hmtmcse/grails-saas.git"
+]
+task resolveDependentGrailsPlugin {
+    doLast {
+        dependentGrailsPlugin.each { name, url ->
+            println("------------------------------------------------------------------------------------------")
+            def destination = file( grailsPluginPath +  name)
+            try{
+                println("Cloning Project ${name}")
+                org.ajoberstar.grgit.Grgit.clone(dir: destination, uri: url)
+            }catch(Exception e){
+                println(e.getMessage())
+            }
+            println("------------------------------------------------------------------------------------------\n")
+        }
+    }
+}
